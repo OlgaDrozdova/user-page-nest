@@ -1,23 +1,34 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { createUserDto } from 'src/dto/create.user.dto';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { LogInDto } from 'src/dto/login.dto';
+import { RegistrationDto } from 'src/dto/registration.dto';
 import { UserService } from './user.service';
 
-@Controller('/api/users')
+@Controller('api')
 export class UsersController {
   constructor(private usersService: UserService) {}
-  @Get()
+  @Get('users')
   getAllUsers() {
     return this.usersService.getAllUsers();
   }
 
-  @Get(':id')
-  getUser(@Param('id') id: string) {
-    return this.usersService.getUser(id);
+  //   @Get('users/:id')
+  //   getUser(@Param('id', new ParseUUIDPipe()) id: string) {
+  //     return this.usersService.getUser(id);
+  //   }
+
+  @Post('login')
+  findByLogin(@Body() dto: LogInDto) {
+    return this.usersService.findByLogin(dto);
   }
 
-  @Post()
-  addUser(@Body() dto: createUserDto) {
-    return this.usersService.addUser(dto.email);
+  @Post('registration')
+  addUser(@Body() dto: RegistrationDto) {
+    return this.usersService.addUser(dto);
+  }
+
+  @Post('delete-user')
+  deleteUser(@Body() id: string) {
+    return this.usersService.deleteUser(id);
   }
 
   searchUser() {

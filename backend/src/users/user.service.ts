@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RegistrationDto } from 'src/dto/registration.dto';
+import { UserDto } from 'src/dto/user.dto';
 import { UserEntity } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
+import { genSalt, hash, compare } from 'bcrypt';
+import { LogInDto } from 'src/dto/login.dto';
 
 @Injectable()
 export class UserService {
@@ -10,32 +14,79 @@ export class UserService {
     private usersRepository: Repository<UserEntity>,
   ) {}
 
-  async getAllUsers(): Promise<UserEntity[]> {
-    const users = await this.usersRepository.find();
-    return users;
-  }
+  async addUser(userDto: RegistrationDto): Promise<UserDto> {
+    const { name, surname, password, email } = userDto;
 
-  async getUser(id: string): Promise<UserEntity> {
-    const user = await this.usersRepository.query(id);
-    return user;
-  }
-
-  async addUser(email: string): Promise<UserEntity> {
     const userByEmail = await this.usersRepository.findOne({
       where: {
         email,
       },
     });
     if (userByEmail) {
-      throw 'error';
+      throw 'User already exists';
     }
+
+    const salt = await genSalt(10);
+    const hashPassword = await hash(password, salt);
+
     let user = new UserEntity();
+    user.name = name;
+    user.surname = surname;
     user.email = email;
+    user.password = hashPassword;
     user = await this.usersRepository.save(user);
+
     return user;
   }
 
+  async findByLogin({ email, password }: LogInDto): Promise<UserDto> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw 'User not found';
+    }
+
+    const areEqual = await compare(password, user.password);
+
+    if (!areEqual) {
+      throw 'Invalid credentials';
+    }
+
+    return user;
+  }
+
+  async findByPayload({ email }: any): Promise<UserDto> {
+    return await this.usersRepository.findOne({
+      where: {
+        email,
+      },
+    });
+  }
+
+  async getAllUsers(): Promise<UserEntity[]> {
+    const users = await this.usersRepository.find();
+    return users;
+  }
+
+  // async getUser(id: string): Promise<UserEntity> {
+  //   const user = await this.usersRepository.findOne({
+  //     where: { id, deletedAt: null },
+  //   });
+  //   if (!user) {
+  //     throw 'error';
+  //   }
+  //   return user;
+  // }
+
   async searchUser() {
     return 'UAUUU';
+  }
+
+  async deleteUser(id: string) {
+    return await this.usersRepository.delete(id);
   }
 }
