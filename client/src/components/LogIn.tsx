@@ -1,8 +1,11 @@
 import { UserLogIn } from '@/types';
+import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 export const LogIn: FC = () => {
+  const router = useRouter();
+
   const form = useForm<UserLogIn>({
     defaultValues: {
       email: '',
@@ -23,6 +26,7 @@ export const LogIn: FC = () => {
       body: JSON.stringify(formData),
     })
       .then((response) => response.json())
+      .then((data) => router.push(`/user/${data.id}`))
       .catch((error) => console.log('error', error.message));
   });
 

@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 import { LogInDto } from 'src/dto/login.dto';
 import { RegistrationDto } from 'src/dto/registration.dto';
 import { UserService } from './user.service';
@@ -11,10 +18,10 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
-  //   @Get('users/:id')
-  //   getUser(@Param('id', new ParseUUIDPipe()) id: string) {
-  //     return this.usersService.getUser(id);
-  //   }
+  @Get('users/:id')
+  getUser(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.usersService.getUser(id);
+  }
 
   @Post('login')
   findByLogin(@Body() dto: LogInDto) {
@@ -31,7 +38,8 @@ export class UsersController {
     return this.usersService.deleteUser(id);
   }
 
-  searchUser() {
-    return 'UAUUU';
+  @Post('search-user')
+  searchUser(@Body() search: string) {
+    return this.usersService.searchUser(search);
   }
 }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RegistrationDto } from 'src/dto/registration.dto';
 import { UserDto } from 'src/dto/user.dto';
 import { UserEntity } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { genSalt, hash, compare } from 'bcrypt';
 import { LogInDto } from 'src/dto/login.dto';
 
@@ -72,18 +72,27 @@ export class UserService {
     return users;
   }
 
-  // async getUser(id: string): Promise<UserEntity> {
-  //   const user = await this.usersRepository.findOne({
-  //     where: { id, deletedAt: null },
-  //   });
-  //   if (!user) {
-  //     throw 'error';
-  //   }
-  //   return user;
-  // }
+  async getUser(id: string): Promise<UserEntity> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw 'error';
+    }
+    return user;
+  }
 
-  async searchUser() {
-    return 'UAUUU';
+  async searchUser({ search }: string): Promise<UserEntity[]> {
+    const qb = this.usersRepository.createQueryBuilder('users');
+    qb.andWhere(
+      new Brackets((query) => {
+        query
+          .where(`users.email ILIKE '%${search}%'`)
+          .orWhere(`users.surname ILIKE '%${search}%'`)
+          .orWhere(`users.name ILIKE '%${search}%'`);
+      }),
+    );
+    return await qb.getMany();
   }
 
   async deleteUser(id: string) {

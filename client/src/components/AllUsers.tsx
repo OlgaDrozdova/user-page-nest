@@ -36,9 +36,9 @@ export const AllUsers = () => {
 
   const handleSubmit = form.handleSubmit(async (data) => {
     const formData = {
-      serch: data.search,
+      search: data.search,
     };
-    fetch('http://localhost:3001/api/users', {
+    fetch('http://localhost:3001/api/search-user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,6 +46,7 @@ export const AllUsers = () => {
       body: JSON.stringify(formData),
     })
       .then((response) => response.json())
+      .then((data) => setUsers(data))
       .catch((error) => console.log('error', error.message));
   });
 

@@ -5,6 +5,11 @@ export interface User {
     email: string;
 }
 
+export interface UserUpdate {
+    name: string;
+    surname: string;
+}
+
 export enum AuthMode {
     LogIn,
     Registration,
