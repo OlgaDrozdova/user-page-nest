@@ -4,15 +4,11 @@ import {
   Post,
   HttpException,
   HttpStatus,
-  Get,
-  Req,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtPayload, LoginStatus, RegistrationStatus } from 'src/types';
+import { LoginStatus, RegistrationStatus } from 'src/types';
 import { LogInDto } from 'src/dto/login.dto';
 import { RegistrationDto } from 'src/dto/registration.dto';
 
@@ -39,11 +35,5 @@ export class AuthController {
   @Post('login')
   public async login(@Body() loginUserDto: LogInDto): Promise<LoginStatus> {
     return await this.authService.login(loginUserDto);
-  }
-
-  @Get('profile')
-  @UseGuards(AuthGuard())
-  public async testAuth(@Req() req: any): Promise<JwtPayload> {
-    return req.user;
   }
 }

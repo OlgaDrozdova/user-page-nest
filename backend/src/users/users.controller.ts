@@ -5,9 +5,11 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { LogInDto } from 'src/dto/login.dto';
 import { RegistrationDto } from 'src/dto/registration.dto';
+import { UpdateDto } from 'src/dto/update.dto';
 import { UserService } from './user.service';
 
 @Controller('api')
@@ -41,5 +43,11 @@ export class UsersController {
   @Post('search-user')
   searchUser(@Body() search: string) {
     return this.usersService.searchUser(search);
+  }
+
+  @Put('update-user/:id')
+  //@Post('update-user')
+  updateUser(@Param('id') id: string, @Body() userUpdateField: UpdateDto) {
+    return this.usersService.updateUser(id, userUpdateField);
   }
 }

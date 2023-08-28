@@ -3,11 +3,12 @@ export interface User {
     name: string;
     surname: string;
     email: string;
+    password: string;
 }
 
 export interface UserUpdate {
-    name: string;
-    surname: string;
+    name?: string;
+    surname?: string;
 }
 
 export enum AuthMode {

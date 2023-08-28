@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegistrationDto } from 'src/dto/registration.dto';
 import { JwtPayload, LoginStatus, RegistrationStatus } from 'src/types';
@@ -43,7 +43,7 @@ export class AuthService {
   async validateUser(payload: JwtPayload): Promise<UserDto> {
     const user = await this.usersService.findByPayload(payload);
     if (!user) {
-      throw 'Invalid token';
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST);
     }
     return user;
   }

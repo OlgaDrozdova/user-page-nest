@@ -1,6 +1,7 @@
 import { User } from '@/types';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { TextField, Button, Grid } from '@mui/material';
 
 export const AllUsers = () => {
   const form = useForm({
@@ -45,24 +46,41 @@ export const AllUsers = () => {
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Something went wrong');
+      })
       .then((data) => setUsers(data))
       .catch((error) => console.log('error', error.message));
   });
 
   return (
     <>
-      <h1>
-        Список пользователей <button onClick={handleUpdate}>Обновить</button>
-      </h1>
+      <Grid display='flex' gap={4} mb={4} alignItems='center'>
+        <h1>Список пользователей</h1>
+        <Button
+          variant='contained'
+          onClick={handleUpdate}
+          sx={{ height: '30px' }}
+        >
+          Обновить
+        </Button>
+      </Grid>
       <FormProvider {...form}>
         <form onSubmit={handleSubmit}>
-          <p>
-            <b>Поиск:</b>
-            <br />
-            <input type='text' {...form.register('search')} />
-          </p>
-          <button type='submit'>Отправить</button>
+          <Grid display='flex' gap={4}>
+            <TextField
+              sx={{ width: '300px' }}
+              label='Поиск'
+              variant='outlined'
+              {...form.register('search')}
+            />
+            <Button type='submit' variant='contained'>
+              Отправить
+            </Button>
+          </Grid>
         </form>
       </FormProvider>
       {users &&
@@ -89,7 +107,7 @@ export const AllUsers = () => {
                 <br />
                 {item.email}
               </p>
-              <button onClick={() => handleDelete(item.id)}>УДОЛИТЬ</button>
+              <Button onClick={() => handleDelete(item.id)}>УДОЛИТЬ</Button>
               <hr />
               <br />
             </div>

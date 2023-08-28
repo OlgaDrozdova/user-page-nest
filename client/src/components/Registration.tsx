@@ -2,6 +2,7 @@ import { UserRegistration } from '@/types';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { TextField, Button, Grid } from '@mui/material';
 
 export const Registration: FC = () => {
   const router = useRouter();
@@ -29,7 +30,12 @@ export const Registration: FC = () => {
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Something went wrong');
+      })
       .then((data) => router.push(`/user/${data.id}`))
       .catch((error) => console.log('error', error.message));
   });
@@ -37,27 +43,37 @@ export const Registration: FC = () => {
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit}>
-        <p>
-          <b>Имя:</b>
-          <br />
-          <input type='text' {...form.register('name')} />
-        </p>
-        <p>
-          <b>Фамилия:</b>
-          <br />
-          <input type='text' {...form.register('surname')} />
-        </p>
-        <p>
-          <b>Email:</b>
-          <br />
-          <input type='text' {...form.register('email')} />
-        </p>
-        <p>
-          <b>Пароль:</b>
-          <br />
-          <input type='text' {...form.register('password')} />
-        </p>
-        <button type='submit'>Отправить</button>
+        <Grid
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+          flexDirection='column'
+          gap={4}
+        >
+          <TextField
+            label='Имя'
+            variant='outlined'
+            {...form.register('name')}
+          />
+          <TextField
+            label='Фамилия'
+            variant='outlined'
+            {...form.register('surname')}
+          />
+          <TextField
+            label='Email'
+            variant='outlined'
+            {...form.register('email')}
+          />
+          <TextField
+            label='Пароль'
+            variant='outlined'
+            {...form.register('password')}
+          />
+          <Button type='submit' variant='contained'>
+            Отправить
+          </Button>
+        </Grid>
       </form>
     </FormProvider>
   );

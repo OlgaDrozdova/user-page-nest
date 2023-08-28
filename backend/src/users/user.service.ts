@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RegistrationDto } from 'src/dto/registration.dto';
 import { UserDto } from 'src/dto/user.dto';
@@ -6,6 +6,7 @@ import { UserEntity } from 'src/entities/user.entity';
 import { Brackets, Repository } from 'typeorm';
 import { genSalt, hash, compare } from 'bcrypt';
 import { LogInDto } from 'src/dto/login.dto';
+import { UpdateDto } from 'src/dto/update.dto';
 
 @Injectable()
 export class UserService {
@@ -23,7 +24,7 @@ export class UserService {
       },
     });
     if (userByEmail) {
-      throw 'User already exists';
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }
 
     const salt = await genSalt(10);
@@ -47,13 +48,13 @@ export class UserService {
     });
 
     if (!user) {
-      throw 'User not found';
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
 
     const areEqual = await compare(password, user.password);
 
     if (!areEqual) {
-      throw 'Invalid credentials';
+      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
     }
 
     return user;
@@ -77,7 +78,7 @@ export class UserService {
       where: { id },
     });
     if (!user) {
-      throw 'error';
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
     return user;
   }
@@ -97,5 +98,13 @@ export class UserService {
 
   async deleteUser(id: string) {
     return await this.usersRepository.delete(id);
+  }
+
+  async updateUser(id: string, userUpdateField: UpdateDto) {
+    const updUser = await this.usersRepository.update({ id }, userUpdateField);
+    if (!updUser.affected) {
+      throw new HttpException('Update error', HttpStatus.BAD_REQUEST);
+    }
+    return await this.getUser(id);
   }
 }
